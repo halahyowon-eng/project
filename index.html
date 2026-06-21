@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>기말고사 D-Day 커넥터 (Final Exam D-Day Tracker)</title>
+  <meta name="description" content="기말고사 일정과 남은 D-Day를 실시간으로 관리하고 시각화해 주는 스마트 스케줄러">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <!-- Deep Background Grid Effects -->
+  <div class="bg-effects">
+    <div class="blob blob-purple"></div>
+    <div class="blob blob-indigo"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Final Exam <span>D-Day</span></h1>
+          <p>기말고사 디데이 커넥터</p>
+        </div>
+      </div>
+
+      <!-- Real-time Next Exam Countdown Ticker -->
+      <div class="ticker-card" id="ticker-card">
+        <div class="ticker-label">
+          <span class="pulse-dot"></span>
+          가장 가까운 시험까지 남은 시간
+        </div>
+        <div class="ticker-content" id="next-exam-ticker">
+          일정을 등록해 주세요
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Dashboard Section -->
+    <section class="stats-section">
+      <div class="stat-card" id="stat-total">
+        <div class="stat-icon icon-total"><i data-lucide="book-open"></i></div>
+        <div class="stat-info">
+          <span class="stat-val" id="total-count">0</span>
+          <span class="stat-label">전체 과목 수</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-impending">
+        <div class="stat-icon icon-impending"><i data-lucide="alert-triangle"></i></div>
+        <div class="stat-info">
+          <span class="stat-val" id="impending-count">0</span>
+          <span class="stat-label">🚨 임박 (D-3 이내)</span>
+        </div>
+      </div>
+      <div class="stat-card" id="stat-completed">
+        <div class="stat-icon icon-completed"><i data-lucide="check-circle-2"></i></div>
+        <div class="stat-info">
+          <span class="stat-val" id="completed-count">0</span>
+          <span class="stat-label">완료된 시험</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Input Panel (Left) -->
+      <section class="panel-input">
+        <div class="glass-card">
+          <h2 class="section-title">
+            <i data-lucide="calendar-plus"></i> 새 시험 일정 등록
+          </h2>
+          <form id="exam-form" class="exam-form" novalidate>
+            <div class="form-group">
+              <label for="course-name">과목명</label>
+              <div class="input-wrapper">
+                <i data-lucide="bookmark" class="input-icon"></i>
+                <input type="text" id="course-name" placeholder="예: 컴퓨터프로그래밍, 사회학이론" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="exam-datetime">시험 날짜 및 시간</label>
+              <div class="input-wrapper">
+                <i data-lucide="calendar" class="input-icon"></i>
+                <input type="datetime-local" id="exam-datetime" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>중요도</label>
+              <div class="priority-selector">
+                <label class="priority-option option-high">
+                  <input type="radio" name="priority" value="상" checked>
+                  <span class="priority-btn">
+                    <span class="dot"></span>상
+                  </span>
+                </label>
+                <label class="priority-option option-medium">
+                  <input type="radio" name="priority" value="중">
+                  <span class="priority-btn">
+                    <span class="dot"></span>중
+                  </span>
+                </label>
+                <label class="priority-option option-low">
+                  <input type="radio" name="priority" value="하">
+                  <span class="priority-btn">
+                    <span class="dot"></span>하
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="add-btn">
+              <i data-lucide="plus-circle"></i> 일정 추가하기
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Dashboard Cards Panel (Right) -->
+      <section class="panel-dashboard">
+        <div class="dashboard-controls">
+          <!-- Filters & Sorting Bar -->
+          <div class="controls-bar">
+            <!-- Search -->
+            <div class="search-box">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="search-input" placeholder="과목명 검색...">
+            </div>
+
+            <!-- Sorting Select -->
+            <div class="sort-box">
+              <label for="sort-select"><i data-lucide="sliders-horizontal"></i> 정렬</label>
+              <select id="sort-select" class="custom-select">
+                <option value="dday-asc">시험일 가까운 순</option>
+                <option value="priority-desc">중요도 높은 순</option>
+                <option value="dday-desc">시험일 먼 순</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Status Tabs -->
+          <div class="tabs-container">
+            <button class="tab-btn active" data-tab="all">전체</button>
+            <button class="tab-btn" data-tab="active">진행중</button>
+            <button class="tab-btn" data-tab="impending">🚨 임박</button>
+            <button class="tab-btn" data-tab="completed">완료</button>
+          </div>
+        </div>
+
+        <!-- Exam Cards Grid -->
+        <div class="exam-grid" id="exam-list-container">
+          <!-- Dynamically Rendered Card Items -->
+        </div>
+
+        <!-- Empty State UI -->
+        <div class="empty-state" id="empty-state" style="display: none;">
+          <div class="empty-icon">
+            <i data-lucide="calendar-range"></i>
+          </div>
+          <h3>등록된 시험 일정이 없습니다</h3>
+          <p>왼쪽 등록 창을 통해 새 기말고사 일정을 추가하고 남은 시간 관리를 시작해 보세요!</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer-credit">
+      <p>&copy; 2026 Final Exam D-Day Tracker. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Load JavaScript -->
+  <script src="app.js"></script>
+  <script>
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
